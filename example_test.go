@@ -1,29 +1,7 @@
-# Go TestBuilder
-
-_⚠️ This tool is under active development and must be considered alpha. It's API may be changed in a breaking way until a 1.0 version is released. Submit issues to the Github issue tracker if found.⚠️_
-
-A workflow like `TestsBuilder` that uses generics for type-safety. The aim of this library is to make it easier to test
-
-- large more use-case oriented functions
-- ... that don't necessarily have a high branch complexity
-- ... but do have a lot of methods
-
-And that without repetition!
-
-## Installation
-
-```bash
-go get github.com/Emptyless/go-testbuilder
-```
-
-## Usage
-
-```go
-package main
+package testbuilder
 
 import (
 	"errors"
-	"github.com/Emptyless/go-testbuilder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -110,7 +88,7 @@ func TestUserController_Handle(t *testing.T) {
 	}
 
 	// builder
-	builder := testbuilder.TestsBuilder[UserController, State, func(t *testing.T, controller UserController, state State, user *User, error error)]{}
+	builder := TestsBuilder[UserController, State, func(t *testing.T, controller UserController, state State, user *User, error error)]{}
 
 	builder.Register("invalid payload").WithSpecificBuilder(func(t *testing.T, sut *UserController, state *State) {
 		state.payload = ""
@@ -175,28 +153,3 @@ func TestUserController_Handle(t *testing.T) {
 		})
 	}
 }
-
-```
-
-## How It Works
-
-TestBuilder manages test cases with three generic types:
-
-1. **SUT** (System Under Test): The component being tested
-2. **STATE**: The test state that can be shared and modified across test cases
-3. **ASSERT**: The assertion logic, typically a function `func(t *testing.T, ...)`
-
-When iterating through test cases:
-
-1. A clean SUT and STATE are initialized before each test
-2. State builders from all previous test cases are applied in order
-3. The specific builder for the current test case is applied
-4. The test's assertion logic is executed
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.

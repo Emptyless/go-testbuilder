@@ -1,0 +1,58 @@
+version: "2"
+linters:
+  default: all
+  disable:
+    - depguard
+    - exhaustruct
+    - funlen
+    - gochecknoglobals
+    - godot
+    - godox
+    - lll
+    - testpackage
+    - varnamelen
+    - wrapcheck
+    - wsl
+  settings:
+    gocritic:
+      disabled-checks:
+        - paramTypeCombine
+        - unnamedResult
+      enabled-tags:
+        - performance
+        - style
+        - diagnostic
+    govet:
+      disable:
+        - fieldalignment
+      enable-all: true
+    nlreturn:
+      block-size: 3
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - err113
+          - goconst
+        path: (.+)_test.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

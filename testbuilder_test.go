@@ -1,10 +1,11 @@
 package testbuilder
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestTestCase_WithStateBuilder(t *testing.T) {
@@ -94,7 +95,7 @@ func TestTestsBuilder_Tests_NoTests(t *testing.T) {
 	builder := TestsBuilder[string, string, func(t *testing.T, sut string, state string)]{}
 
 	// Act
-	for testName, _ := range builder.Tests() {
+	for testName := range builder.Tests() {
 		t.Run(testName, func(t *testing.T) {
 			t.Parallel()
 			// Arrange
@@ -111,7 +112,7 @@ func TestTestsBuilder_Tests_StopDuringYield(t *testing.T) {
 	builder.Register("test2")
 
 	// Act
-	for testName, _ := range builder.Tests() {
+	for testName := range builder.Tests() {
 		t.Run(testName, func(t *testing.T) {
 			t.Parallel()
 			// nothing to do

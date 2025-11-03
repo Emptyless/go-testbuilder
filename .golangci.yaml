@@ -9,6 +9,8 @@ linters:
     - godot
     - godox
     - lll
+    - paralleltest
+    - revive
     - testpackage
     - varnamelen
     - wrapcheck

@@ -16,7 +16,7 @@ fmt: ## Format go code
 
 tools: ## Install extra tools for development
 	go install mvdan.cc/gofumpt@latest
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 
 lint: ## Lint the code locally
-	golangci-lint run --timeout 600s
+	golangci-lint run --timeout 600s --fix

@@ -14,16 +14,22 @@ func TestTestCase_WithStateBuilder(t *testing.T) {
 	testcase := &TestCase[string, string, func()]{}
 
 	// Act
-	res := testcase.WithStateBuilder(func(t *testing.T, sut *string, state *string) {
-		*sut = "sut"
-		*state = "state"
-	})
+	res := testcase.
+		WithStateBuilder(func(t *testing.T, sut *string, state *string) {
+			t.Helper()
+
+			*sut = "sut"
+			*state = "state"
+		})
 
 	// Assert
 	assert.Equal(t, testcase, res) // pointer equal
 	require.NotNil(t, testcase.StateBuilder)
+
 	var sut string
+
 	var state string
+
 	testcase.StateBuilder(t, &sut, &state)
 	assert.Equal(t, "sut", sut)
 	assert.Equal(t, "state", state)
@@ -35,17 +41,25 @@ func TestTestCase_WithSpecificBuilder(t *testing.T) {
 	testcase := &TestCase[string, string, func()]{}
 
 	// Act
-	res := testcase.WithSpecificBuilder(func(t *testing.T, sut *string, state *string) {
-		*sut = "sut"
-		*state = "state"
-	})
+	res := testcase.
+		WithSpecificBuilder(func(t *testing.T, sut *string, state *string) {
+			t.Helper()
+
+			*sut = "sut"
+			*state = "state"
+		})
 
 	// Assert
 	assert.Equal(t, testcase, res) // pointer equal
 	require.NotNil(t, testcase.SpecificBuilder)
-	var sut string
-	var state string
+
+	var (
+		sut   string
+		state string
+	)
+
 	testcase.SpecificBuilder(t, &sut, &state)
+
 	assert.Equal(t, "sut", sut)
 	assert.Equal(t, "state", state)
 }
@@ -56,10 +70,13 @@ func TestTestCase_WithAssertion(t *testing.T) {
 	testcase := &TestCase[string, string, func(t *testing.T, sut string, state string)]{}
 
 	// Act
-	res := testcase.WithAssertion(func(t *testing.T, sut string, state string) {
-		assert.Equal(t, "sut", sut)
-		assert.Equal(t, "state", state)
-	})
+	res := testcase.
+		WithAssertion(func(t *testing.T, sut string, state string) {
+			t.Helper()
+
+			assert.Equal(t, "sut", sut)
+			assert.Equal(t, "state", state)
+		})
 
 	// Assert
 	assert.Equal(t, testcase, res) // pointer equal
@@ -73,16 +90,25 @@ func TestTestsBuilder_Register(t *testing.T) {
 	builder := TestsBuilder[string, string, func(t *testing.T, sut string, state string)]{}
 
 	// Act
-	res := builder.Register("test").WithStateBuilder(func(t *testing.T, sut *string, state *string) {
-		*sut = "sut"
-		*state = "state"
-	}).WithSpecificBuilder(func(t *testing.T, sut *string, state *string) {
-		*sut = "specific-sut"
-		*state = "specific-state"
-	}).WithAssertion(func(t *testing.T, sut string, state string) {
-		assert.Equal(t, "specific-sut", sut)
-		assert.Equal(t, "specific-state", state)
-	})
+	res := builder.Register("test").
+		WithStateBuilder(func(t *testing.T, sut *string, state *string) {
+			t.Helper()
+
+			*sut = "sut"
+			*state = "state"
+		}).
+		WithSpecificBuilder(func(t *testing.T, sut *string, state *string) {
+			t.Helper()
+
+			*sut = "specific-sut"
+			*state = "specific-state"
+		}).
+		WithAssertion(func(t *testing.T, sut string, state string) {
+			t.Helper()
+
+			assert.Equal(t, "specific-sut", sut)
+			assert.Equal(t, "specific-state", state)
+		})
 
 	// Assert
 	require.Len(t, builder.TestCases, 1)
@@ -117,6 +143,7 @@ func TestTestsBuilder_Tests_StopDuringYield(t *testing.T) {
 			t.Parallel()
 			// nothing to do
 		})
+
 		return
 	}
 }
@@ -125,13 +152,19 @@ func TestTestsBuilder_SingleTest_SpecificBuilderTakesPrecedence(t *testing.T) {
 	t.Parallel()
 	// Arrange
 	builder := TestsBuilder[string, string, func(t *testing.T, sut string, state string)]{}
-	builder.Register("test").WithStateBuilder(func(t *testing.T, sut *string, state *string) {
-		*sut = "sut"
-		*state = "state"
-	}).WithSpecificBuilder(func(t *testing.T, sut *string, state *string) {
-		*sut = "specific-sut"
-		*state = "specific-state"
-	})
+	builder.Register("test").
+		WithStateBuilder(func(t *testing.T, sut *string, state *string) {
+			t.Helper()
+
+			*sut = "sut"
+			*state = "state"
+		}).
+		WithSpecificBuilder(func(t *testing.T, sut *string, state *string) {
+			t.Helper()
+
+			*sut = "specific-sut"
+			*state = "specific-state"
+		})
 
 	for testName, testBuilder := range builder.Tests() {
 		assert.Equal(t, "test", testName)
@@ -151,18 +184,30 @@ func TestTestsBuilder_MultipleTests_StateIsRepeated(t *testing.T) {
 	t.Parallel()
 	// Arrange
 	builder := TestsBuilder[string, int, func(t *testing.T)]{}
-	builder.Register("1").WithStateBuilder(func(t *testing.T, sut *string, state *int) {
-		*state += 1
-	})
-	builder.Register("2").WithStateBuilder(func(t *testing.T, sut *string, state *int) {
-		*state += 1
-	})
-	builder.Register("3").WithStateBuilder(func(t *testing.T, sut *string, state *int) {
-		*state += 1
-	})
-	builder.Register("4").WithStateBuilder(func(t *testing.T, sut *string, state *int) {
-		*state += 1
-	})
+	builder.Register("1").
+		WithStateBuilder(func(t *testing.T, _ *string, state *int) {
+			t.Helper()
+
+			*state += 1
+		})
+	builder.Register("2").
+		WithStateBuilder(func(t *testing.T, _ *string, state *int) {
+			t.Helper()
+
+			*state += 1
+		})
+	builder.Register("3").
+		WithStateBuilder(func(t *testing.T, _ *string, state *int) {
+			t.Helper()
+
+			*state += 1
+		})
+	builder.Register("4").
+		WithStateBuilder(func(t *testing.T, _ *string, state *int) {
+			t.Helper()
+
+			*state += 1
+		})
 
 	for testName, testBuilder := range builder.Tests() {
 		t.Run(testName, func(t *testing.T) {
@@ -182,20 +227,35 @@ func TestTestsBuilder_MultipleTests_PreviousSpecificTestsAreIgnored(t *testing.T
 	t.Parallel()
 	// Arrange
 	builder := TestsBuilder[string, int, func(t *testing.T)]{}
-	builder.Register("1").WithStateBuilder(func(t *testing.T, sut *string, state *int) {
-		*sut = "a"
-	})
-	builder.Register("2").WithStateBuilder(func(t *testing.T, sut *string, state *int) {
-		*sut += "b"
-	})
-	builder.Register("3").WithStateBuilder(func(t *testing.T, sut *string, state *int) {
-		*sut += "c"
-	}).WithSpecificBuilder(func(t *testing.T, sut *string, state *int) {
-		*sut = "-" // this should not be visible in test4
-	})
-	builder.Register("4").WithStateBuilder(func(t *testing.T, sut *string, state *int) {
-		*sut += "d"
-	})
+	builder.Register("1").
+		WithStateBuilder(func(t *testing.T, sut *string, state *int) {
+			t.Helper()
+
+			*sut = "a"
+		})
+	builder.Register("2").
+		WithStateBuilder(func(t *testing.T, sut *string, state *int) {
+			t.Helper()
+
+			*sut += "b"
+		})
+	builder.Register("3").
+		WithStateBuilder(func(t *testing.T, sut *string, state *int) {
+			t.Helper()
+
+			*sut += "c"
+		}).
+		WithSpecificBuilder(func(t *testing.T, sut *string, state *int) {
+			t.Helper()
+
+			*sut = "-" // this should not be visible in test4
+		})
+	builder.Register("4").
+		WithStateBuilder(func(t *testing.T, sut *string, state *int) {
+			t.Helper()
+
+			*sut += "d"
+		})
 
 	results := map[string]string{
 		"1": "a",

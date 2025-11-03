@@ -77,6 +77,7 @@ func (ts *TestsBuilder[SUT, STATE, ASSERT]) Register(name string) *TestCase[SUT,
 		TestName: name,
 	}
 	ts.TestCases = append(ts.TestCases, testcase)
+
 	return testcase
 }
 
@@ -93,8 +94,12 @@ func (ts *TestsBuilder[SUT, STATE, ASSERT]) Tests() iter.Seq2[string, func(t *te
 	return func(yield func(string, func(t *testing.T) TestData[SUT, STATE, ASSERT]) bool) {
 		for i, curcase := range ts.TestCases {
 			build := func(t *testing.T) TestData[SUT, STATE, ASSERT] {
-				var sut SUT
-				var state STATE
+				t.Helper()
+
+				var (
+					sut   SUT
+					state STATE
+				)
 
 				for j, testcase := range ts.TestCases {
 					if builder := testcase.StateBuilder; builder != nil {
